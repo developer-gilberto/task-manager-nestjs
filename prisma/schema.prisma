@@ -15,5 +15,35 @@ model Project {
   created_at  DateTime @default(now())
   update_at   DateTime @updatedAt
 
+  tasks Task[]
+
   @@map("projects")
+}
+
+enum TaskStatus {
+  TO_DO
+  IN_PROGRESS
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model Task {
+  id          String       @id @default(uuid())
+  title       String
+  description String?
+  status      TaskStatus   @default(TO_DO)
+  priority    TaskPriority @default(MEDIUM)
+  due_date    DateTime     @default(now())
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+
+  project_id String
+  project    Project @relation(fields: [project_id], references: [id])
+
+  @@map("tasks")
 }
