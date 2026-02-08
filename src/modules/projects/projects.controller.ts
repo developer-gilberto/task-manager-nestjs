@@ -24,8 +24,8 @@ export class ProjectsController {
 
   @Get()
   @ApiResponse({ type: [ProjectListItemDTO] })
-  getAll() {
-    return this.projectService.getAll()
+  async getAll() {
+    return await this.projectService.getAll()
   }
 
   @Get(':id')
@@ -42,8 +42,8 @@ export class ProjectsController {
 
   @Post()
   @ApiResponse({ type: ProjectListItemDTO })
-  create(@Body() data: ProjectsRequestDTO) {
-    return this.projectService.create(data)
+  async create(@Body() data: ProjectsRequestDTO) {
+    return await this.projectService.create(data)
   }
 
   @Put(':id')

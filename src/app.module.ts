@@ -3,8 +3,8 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AppController2 } from './app2.controller'
 import { ProjectsModule } from './modules/projects/projects.module'
+import { TasksModule } from './modules/tasks/tasks.module'
 import { PrismaService } from './prisma.service'
-import { TasksModule } from './modules/tasks/tasks.module';
 
 @Module({
   imports: [ProjectsModule, TasksModule],
