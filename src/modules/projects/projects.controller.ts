@@ -28,10 +28,10 @@ export class ProjectsController {
     return await this.projectService.getAll()
   }
 
-  @Get(':id')
+  @Get(':project_id')
   @ApiResponse({ type: ProjectListItemDTO })
-  async getById(@Param('id', ParseUUIDPipe) id: string) {
-    const project = await this.projectService.getById(id)
+  async getById(@Param('project_id', ParseUUIDPipe) projectId: string) {
+    const project = await this.projectService.getById(projectId)
 
     if (!project) {
       throw new HttpException('Project not found', HttpStatus.NOT_FOUND)
@@ -46,27 +46,30 @@ export class ProjectsController {
     return await this.projectService.create(data)
   }
 
-  @Put(':id')
+  @Put(':project_id')
   @ApiResponse({ type: ProjectListItemDTO })
-  async update(@Param('id', ParseUUIDPipe) id: string, @Body() data: ProjectsRequestDTO) {
-    const project = await this.projectService.getById(id)
+  async update(
+    @Param('project_id', ParseUUIDPipe) projectId: string,
+    @Body() data: ProjectsRequestDTO,
+  ) {
+    const project = await this.projectService.getById(projectId)
 
     if (!project) {
       throw new HttpException('Project not found', HttpStatus.NOT_FOUND)
     }
 
-    return this.projectService.update(id, data)
+    return this.projectService.update(projectId, data)
   }
 
-  @Delete(':id')
+  @Delete(':project_id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async delete(@Param('id', ParseUUIDPipe) id: string) {
-    const project = await this.projectService.getById(id)
+  async delete(@Param('project_id', ParseUUIDPipe) projectId: string) {
+    const project = await this.projectService.getById(projectId)
 
     if (!project) {
       throw new HttpException('Project not found', HttpStatus.NOT_FOUND)
     }
 
-    return this.projectService.delete(id)
+    return this.projectService.delete(projectId)
   }
 }

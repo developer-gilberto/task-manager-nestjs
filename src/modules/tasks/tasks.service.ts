@@ -22,7 +22,7 @@ export class TasksService {
     return await this.prismaClient.task.create({
       data: {
         ...data,
-        projectId,
+        project_id: projectId,
       },
     })
   }

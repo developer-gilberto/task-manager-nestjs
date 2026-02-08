@@ -10,19 +10,19 @@ export class ProjectsService {
     return await this.prismaClient.project.findMany()
   }
 
-  async getById(id: string) {
-    return await this.prismaClient.project.findFirst({ where: { id } })
+  async getById(projectId: string) {
+    return await this.prismaClient.project.findFirst({ where: { id: projectId } })
   }
 
   async create(data: ProjectsRequestDTO) {
     return await this.prismaClient.project.create({ data })
   }
 
-  async update(id: string, data: ProjectsRequestDTO) {
-    return await this.prismaClient.project.update({ where: { id }, data })
+  async update(projectId: string, data: ProjectsRequestDTO) {
+    return await this.prismaClient.project.update({ where: { id: projectId }, data })
   }
 
-  async delete(id: string) {
-    return await this.prismaClient.project.delete({ where: { id } })
+  async delete(projectId: string) {
+    return await this.prismaClient.project.delete({ where: { id: projectId } })
   }
 }
