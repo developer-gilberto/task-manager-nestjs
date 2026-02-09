@@ -4,21 +4,28 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpException,
   HttpStatus,
-  Param,
-  ParseUUIDPipe,
   Post,
   Put,
+  Req,
+  UseInterceptors,
 } from '@nestjs/common'
 import { ApiResponse } from '@nestjs/swagger'
+import { ValidateId } from 'src/common/decorators/validate-id.decorator'
+import { ValidateIdInterceptor } from 'src/common/interceptors/validate-id.interceptor'
+import { Project } from 'src/generated/prisma/client'
 import { ProjectListItemDTO, ProjectsRequestDTO } from './projects.dto'
 import { ProjectsService } from './projects.service'
+
+interface RequestWithProject extends Request {
+  project: Project
+}
 
 @Controller({
   version: '1',
   path: 'projects',
 })
+@UseInterceptors(ValidateIdInterceptor)
 export class ProjectsController {
   constructor(private readonly projectService: ProjectsService) {}
 
@@ -30,14 +37,9 @@ export class ProjectsController {
 
   @Get(':project_id')
   @ApiResponse({ type: ProjectListItemDTO })
-  async getById(@Param('project_id', ParseUUIDPipe) projectId: string) {
-    const project = await this.projectService.getById(projectId)
-
-    if (!project) {
-      throw new HttpException('Project not found', HttpStatus.NOT_FOUND)
-    }
-
-    return project
+  @ValidateId()
+  async getById(@Req() req: RequestWithProject) {
+    return req.project
   }
 
   @Post()
@@ -48,28 +50,15 @@ export class ProjectsController {
 
   @Put(':project_id')
   @ApiResponse({ type: ProjectListItemDTO })
-  async update(
-    @Param('project_id', ParseUUIDPipe) projectId: string,
-    @Body() data: ProjectsRequestDTO,
-  ) {
-    const project = await this.projectService.getById(projectId)
-
-    if (!project) {
-      throw new HttpException('Project not found', HttpStatus.NOT_FOUND)
-    }
-
-    return this.projectService.update(projectId, data)
+  @ValidateId()
+  async update(@Req() req: RequestWithProject, @Body() data: ProjectsRequestDTO) {
+    return this.projectService.update(req.project.id, data)
   }
 
   @Delete(':project_id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async delete(@Param('project_id', ParseUUIDPipe) projectId: string) {
-    const project = await this.projectService.getById(projectId)
-
-    if (!project) {
-      throw new HttpException('Project not found', HttpStatus.NOT_FOUND)
-    }
-
-    return this.projectService.delete(projectId)
+  @ValidateId()
+  async delete(@Req() req: RequestWithProject) {
+    return this.projectService.delete(req.project.id)
   }
 }
