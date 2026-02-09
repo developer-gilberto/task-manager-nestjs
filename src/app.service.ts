@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common'
 export class AppService {
   getHealthCheck(): { message: string } {
     return {
-      message: 'API v1 is running!',
+      message: 'API v1 is running! Documentation available at:  /api/v1/docs',
     }
   }
 }
