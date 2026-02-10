@@ -5,6 +5,8 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseUUIDPipe,
   Post,
   Put,
   Req,
@@ -14,7 +16,7 @@ import { ApiResponse } from '@nestjs/swagger'
 import { ValidateId } from 'src/common/decorators/validate-id.decorator'
 import { ValidateIdInterceptor } from 'src/common/interceptors/validate-id.interceptor'
 import { Project } from 'src/generated/prisma/client'
-import { ProjectListItemDTO, ProjectsRequestDTO } from './projects.dto'
+import { ProjectFullDTO, ProjectListItemDTO, ProjectsRequestDTO } from './projects.dto'
 import { ProjectsService } from './projects.service'
 
 interface RequestWithProject extends Request {
@@ -36,10 +38,10 @@ export class ProjectsController {
   }
 
   @Get(':project_id')
-  @ApiResponse({ type: ProjectListItemDTO })
+  @ApiResponse({ type: ProjectFullDTO })
   @ValidateId()
-  async getById(@Req() req: RequestWithProject) {
-    return req.project
+  async getById(@Param('project_id', ParseUUIDPipe) projectId: string) {
+    return this.projectService.getById(projectId)
   }
 
   @Post()

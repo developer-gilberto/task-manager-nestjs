@@ -11,7 +11,31 @@ export class ProjectsService {
   }
 
   async getById(projectId: string) {
-    return await this.prismaClient.project.findFirst({ where: { id: projectId } })
+    return await this.prismaClient.project.findFirst({
+      where: {
+        id: projectId,
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        created_at: true,
+        update_at: true,
+
+        tasks: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            status: true,
+            priority: true,
+            due_date: true,
+            created_at: true,
+            updated_at: true,
+          },
+        },
+      },
+    })
   }
 
   async create(data: ProjectsRequestDTO) {
