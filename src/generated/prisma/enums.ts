@@ -9,6 +9,23 @@
 * 🟢 You can import this file directly.
 */
 
+export const UserRole = {
+  USER: 'USER',
+  ADMIN: 'ADMIN'
+} as const
+
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
+
+export const CollaboratorRole = {
+  VIEWER: 'VIEWER',
+  EDITOR: 'EDITOR',
+  OWNER: 'OWNER'
+} as const
+
+export type CollaboratorRole = (typeof CollaboratorRole)[keyof typeof CollaboratorRole]
+
+
 export const TaskStatus = {
   TO_DO: 'TO_DO',
   IN_PROGRESS: 'IN_PROGRESS',

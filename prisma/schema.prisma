@@ -8,16 +8,63 @@ datasource db {
   provider = "postgresql"
 }
 
-model Project {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+enum UserRole {
+  USER
+  ADMIN
+}
 
-  tasks Task[]
+model User {
+  id         String   @id @default(uuid())
+  name       String
+  email      String   @unique
+  password   String
+  avatar     String?
+  role       UserRole @default(USER)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  created_projects Project[]             @relation("user_projects")
+  tasks_assigned   Task[]                @relation("assigned_tasks")
+  comments         Comment[]
+  collaborations   ProjectCollaborator[]
+
+  @@map("users")
+}
+
+model Project {
+  id            String   @id @default(uuid())
+  name          String
+  description   String?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  created_by_id String
+
+  created_by User @relation("user_projects", fields: [created_by_id], references: [id])
+
+  tasks                 Task[]
+  project_collaborators ProjectCollaborator[]
 
   @@map("projects")
+}
+
+enum CollaboratorRole {
+  VIEWER
+  EDITOR
+  OWNER
+}
+
+model ProjectCollaborator {
+  id         String           @id @default(uuid())
+  role       CollaboratorRole @default(EDITOR)
+  user_id    String
+  project_id String
+  created_at DateTime         @default(now())
+
+  user    User    @relation(fields: [user_id], references: [id])
+  project Project @relation(fields: [project_id], references: [id])
+
+  @@unique([user_id, project_id])
+  @@map("project_collaborators")
 }
 
 enum TaskStatus {
@@ -41,9 +88,26 @@ model Task {
   due_date    DateTime     @default(now())
   created_at  DateTime     @default(now())
   updated_at  DateTime     @updatedAt
+  project_id  String
+  assignee_id String?
 
-  project_id String
-  project    Project @relation(fields: [project_id], references: [id])
+  project  Project   @relation(fields: [project_id], references: [id])
+  assignee User?     @relation("assigned_tasks", fields: [assignee_id], references: [id])
+  comments Comment[]
 
   @@map("tasks")
+}
+
+model Comment {
+  id         String   @id @default(uuid())
+  content    String
+  author_id  String
+  task_id    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  author User @relation(fields: [author_id], references: [id])
+  task   Task @relation(fields: [task_id], references: [id])
+
+  @@map("comments")
 }

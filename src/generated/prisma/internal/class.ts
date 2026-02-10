@@ -20,7 +20,7 @@ const config: runtime.GetPrismaClientConfig = {
   "clientVersion": "7.3.0",
   "engineVersion": "9d6ad21cbbceab97458517b147a6a09ff43aa735",
   "activeProvider": "postgresql",
-  "inlineSchema": "generator client {\n  provider     = \"prisma-client\"\n  output       = \"../src/generated/prisma\"\n  moduleFormat = \"cjs\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Project {\n  id          String   @id @default(uuid())\n  name        String\n  description String?\n  created_at  DateTime @default(now())\n  updated_at  DateTime @updatedAt\n\n  tasks Task[]\n\n  @@map(\"projects\")\n}\n\nenum TaskStatus {\n  TO_DO\n  IN_PROGRESS\n  DONE\n}\n\nenum TaskPriority {\n  LOW\n  MEDIUM\n  HIGH\n}\n\nmodel Task {\n  id          String       @id @default(uuid())\n  title       String\n  description String?\n  status      TaskStatus   @default(TO_DO)\n  priority    TaskPriority @default(MEDIUM)\n  due_date    DateTime     @default(now())\n  created_at  DateTime     @default(now())\n  updated_at  DateTime     @updatedAt\n\n  project_id String\n  project    Project @relation(fields: [project_id], references: [id])\n\n  @@map(\"tasks\")\n}\n",
+  "inlineSchema": "generator client {\n  provider     = \"prisma-client\"\n  output       = \"../src/generated/prisma\"\n  moduleFormat = \"cjs\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nenum UserRole {\n  USER\n  ADMIN\n}\n\nmodel User {\n  id         String   @id @default(uuid())\n  name       String\n  email      String   @unique\n  password   String\n  avatar     String?\n  role       UserRole @default(USER)\n  created_at DateTime @default(now())\n  updated_at DateTime @updatedAt\n\n  created_projects Project[]             @relation(\"user_projects\")\n  tasks_assigned   Task[]                @relation(\"assigned_tasks\")\n  comments         Comment[]\n  collaborations   ProjectCollaborator[]\n\n  @@map(\"users\")\n}\n\nmodel Project {\n  id            String   @id @default(uuid())\n  name          String\n  description   String?\n  created_at    DateTime @default(now())\n  updated_at    DateTime @updatedAt\n  created_by_id String\n\n  created_by User @relation(\"user_projects\", fields: [created_by_id], references: [id])\n\n  tasks                 Task[]\n  project_collaborators ProjectCollaborator[]\n\n  @@map(\"projects\")\n}\n\nenum CollaboratorRole {\n  VIEWER\n  EDITOR\n  OWNER\n}\n\nmodel ProjectCollaborator {\n  id         String           @id @default(uuid())\n  role       CollaboratorRole @default(EDITOR)\n  user_id    String\n  project_id String\n  created_at DateTime         @default(now())\n\n  user    User    @relation(fields: [user_id], references: [id])\n  project Project @relation(fields: [project_id], references: [id])\n\n  @@unique([user_id, project_id])\n  @@map(\"project_collaborators\")\n}\n\nenum TaskStatus {\n  TO_DO\n  IN_PROGRESS\n  DONE\n}\n\nenum TaskPriority {\n  LOW\n  MEDIUM\n  HIGH\n}\n\nmodel Task {\n  id          String       @id @default(uuid())\n  title       String\n  description String?\n  status      TaskStatus   @default(TO_DO)\n  priority    TaskPriority @default(MEDIUM)\n  due_date    DateTime     @default(now())\n  created_at  DateTime     @default(now())\n  updated_at  DateTime     @updatedAt\n  project_id  String\n  assignee_id String?\n\n  project  Project   @relation(fields: [project_id], references: [id])\n  assignee User?     @relation(\"assigned_tasks\", fields: [assignee_id], references: [id])\n  comments Comment[]\n\n  @@map(\"tasks\")\n}\n\nmodel Comment {\n  id         String   @id @default(uuid())\n  content    String\n  author_id  String\n  task_id    String\n  created_at DateTime @default(now())\n  updated_at DateTime @updatedAt\n\n  author User @relation(fields: [author_id], references: [id])\n  task   Task @relation(fields: [task_id], references: [id])\n\n  @@map(\"comments\")\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -28,7 +28,7 @@ const config: runtime.GetPrismaClientConfig = {
   }
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Project\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updated_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"tasks\",\"kind\":\"object\",\"type\":\"Task\",\"relationName\":\"ProjectToTask\"}],\"dbName\":\"projects\"},\"Task\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"TaskStatus\"},{\"name\":\"priority\",\"kind\":\"enum\",\"type\":\"TaskPriority\"},{\"name\":\"due_date\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updated_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"project_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"project\",\"kind\":\"object\",\"type\":\"Project\",\"relationName\":\"ProjectToTask\"}],\"dbName\":\"tasks\"}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"avatar\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"UserRole\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updated_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"created_projects\",\"kind\":\"object\",\"type\":\"Project\",\"relationName\":\"user_projects\"},{\"name\":\"tasks_assigned\",\"kind\":\"object\",\"type\":\"Task\",\"relationName\":\"assigned_tasks\"},{\"name\":\"comments\",\"kind\":\"object\",\"type\":\"Comment\",\"relationName\":\"CommentToUser\"},{\"name\":\"collaborations\",\"kind\":\"object\",\"type\":\"ProjectCollaborator\",\"relationName\":\"ProjectCollaboratorToUser\"}],\"dbName\":\"users\"},\"Project\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updated_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"created_by_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"created_by\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"user_projects\"},{\"name\":\"tasks\",\"kind\":\"object\",\"type\":\"Task\",\"relationName\":\"ProjectToTask\"},{\"name\":\"project_collaborators\",\"kind\":\"object\",\"type\":\"ProjectCollaborator\",\"relationName\":\"ProjectToProjectCollaborator\"}],\"dbName\":\"projects\"},\"ProjectCollaborator\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"CollaboratorRole\"},{\"name\":\"user_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"project_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"ProjectCollaboratorToUser\"},{\"name\":\"project\",\"kind\":\"object\",\"type\":\"Project\",\"relationName\":\"ProjectToProjectCollaborator\"}],\"dbName\":\"project_collaborators\"},\"Task\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"TaskStatus\"},{\"name\":\"priority\",\"kind\":\"enum\",\"type\":\"TaskPriority\"},{\"name\":\"due_date\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updated_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"project_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"assignee_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"project\",\"kind\":\"object\",\"type\":\"Project\",\"relationName\":\"ProjectToTask\"},{\"name\":\"assignee\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"assigned_tasks\"},{\"name\":\"comments\",\"kind\":\"object\",\"type\":\"Comment\",\"relationName\":\"CommentToTask\"}],\"dbName\":\"tasks\"},\"Comment\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"content\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"author_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"task_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updated_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"author\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"CommentToUser\"},{\"name\":\"task\",\"kind\":\"object\",\"type\":\"Task\",\"relationName\":\"CommentToTask\"}],\"dbName\":\"comments\"}},\"enums\":{},\"types\":{}}")
 
 async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Module> {
   const { Buffer } = await import('node:buffer')
@@ -60,8 +60,8 @@ export interface PrismaClientConstructor {
    * @example
    * ```
    * const prisma = new PrismaClient()
-   * // Fetch zero or more Projects
-   * const projects = await prisma.project.findMany()
+   * // Fetch zero or more Users
+   * const users = await prisma.user.findMany()
    * ```
    * 
    * Read more in our [docs](https://pris.ly/d/client).
@@ -82,8 +82,8 @@ export interface PrismaClientConstructor {
  * @example
  * ```
  * const prisma = new PrismaClient()
- * // Fetch zero or more Projects
- * const projects = await prisma.project.findMany()
+ * // Fetch zero or more Users
+ * const users = await prisma.user.findMany()
  * ```
  * 
  * Read more in our [docs](https://pris.ly/d/client).
@@ -177,6 +177,16 @@ export interface PrismaClient<
   }>>
 
       /**
+   * `prisma.user`: Exposes CRUD operations for the **User** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Users
+    * const users = await prisma.user.findMany()
+    * ```
+    */
+  get user(): Prisma.UserDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
    * `prisma.project`: Exposes CRUD operations for the **Project** model.
     * Example usage:
     * ```ts
@@ -187,6 +197,16 @@ export interface PrismaClient<
   get project(): Prisma.ProjectDelegate<ExtArgs, { omit: OmitOpts }>;
 
   /**
+   * `prisma.projectCollaborator`: Exposes CRUD operations for the **ProjectCollaborator** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ProjectCollaborators
+    * const projectCollaborators = await prisma.projectCollaborator.findMany()
+    * ```
+    */
+  get projectCollaborator(): Prisma.ProjectCollaboratorDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
    * `prisma.task`: Exposes CRUD operations for the **Task** model.
     * Example usage:
     * ```ts
@@ -195,6 +215,16 @@ export interface PrismaClient<
     * ```
     */
   get task(): Prisma.TaskDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.comment`: Exposes CRUD operations for the **Comment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Comments
+    * const comments = await prisma.comment.findMany()
+    * ```
+    */
+  get comment(): Prisma.CommentDelegate<ExtArgs, { omit: OmitOpts }>;
 }
 
 export function getPrismaClientClass(): PrismaClientConstructor {
