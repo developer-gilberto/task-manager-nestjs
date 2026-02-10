@@ -13,7 +13,7 @@ model Project {
   name        String
   description String?
   created_at  DateTime @default(now())
-  update_at   DateTime @updatedAt
+  updated_at  DateTime @updatedAt
 
   tasks Task[]
 

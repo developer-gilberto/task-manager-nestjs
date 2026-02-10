@@ -20,7 +20,7 @@ export class ProjectsService {
         name: true,
         description: true,
         created_at: true,
-        update_at: true,
+        updated_at: true,
 
         tasks: {
           select: {

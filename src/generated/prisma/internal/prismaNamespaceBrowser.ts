@@ -76,7 +76,7 @@ export const ProjectScalarFieldEnum = {
   name: 'name',
   description: 'description',
   created_at: 'created_at',
-  update_at: 'update_at'
+  updated_at: 'updated_at'
 } as const
 
 export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum]
