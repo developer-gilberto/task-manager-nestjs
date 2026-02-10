@@ -23,6 +23,10 @@ export class ProjectsService {
   }
 
   async delete(projectId: string) {
+    await this.prismaClient.task.deleteMany({
+      where: { project_id: projectId },
+    })
+
     return await this.prismaClient.project.delete({ where: { id: projectId } })
   }
 }
