@@ -32,6 +32,21 @@ export class ValidateIdInterceptor implements NestInterceptor {
 
     if (!project) throw new NotFoundException('Project not found')
 
+    const { task_id } = request.params
+
+    if (task_id) {
+      const task = await this.prismaClient.task.findFirst({
+        where: {
+          project_id,
+          id: task_id,
+        },
+      })
+
+      if (!task) throw new NotFoundException('Task not found')
+
+      request.task = task
+    }
+
     request.project = project
 
     return next.handle()

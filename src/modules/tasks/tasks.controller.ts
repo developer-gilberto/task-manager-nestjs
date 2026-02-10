@@ -9,36 +9,48 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  Req,
+  UseInterceptors,
 } from '@nestjs/common'
+import { ValidateId } from 'src/common/decorators/validate-id.decorator'
+import { ValidateIdInterceptor } from 'src/common/interceptors/validate-id.interceptor'
+import { Project, Task } from 'src/generated/prisma/client'
 import { TaskDTO } from './tasks.dto'
 import { TasksService } from './tasks.service'
+
+interface RequestWithProjectAndTask extends Request {
+  project: Project
+  task: Task
+}
 
 @Controller({
   version: '1',
   path: 'projects/:project_id/tasks',
 })
+@UseInterceptors(ValidateIdInterceptor)
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Get()
+  @ValidateId()
   async getAllProjects(@Param('project_id', ParseUUIDPipe) projectId: string) {
     return await this.tasksService.getAllByProject(projectId)
   }
 
   @Get(':task_id')
-  async getById(
-    @Param('project_id', ParseUUIDPipe) projectId: string,
-    @Param('task_id', ParseUUIDPipe) taskId: string,
-  ) {
-    return await this.tasksService.getById(projectId, taskId)
+  @ValidateId()
+  async getById(@Req() req: RequestWithProjectAndTask) {
+    return req.task
   }
 
   @Post()
+  @ValidateId()
   async create(@Param('project_id', ParseUUIDPipe) projectId: string, @Body() data: TaskDTO) {
     return await this.tasksService.create(projectId, data)
   }
 
   @Put(':task_id')
+  @ValidateId()
   async update(
     @Param('project_id', ParseUUIDPipe) ProjectId: string,
     @Param('task_id', ParseUUIDPipe) taskId: string,
@@ -48,6 +60,7 @@ export class TasksController {
   }
 
   @Delete(':task_id')
+  @ValidateId()
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(
     @Param('project_id', ParseUUIDPipe) projectId: string,
