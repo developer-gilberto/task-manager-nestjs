@@ -39,7 +39,7 @@ export class ProjectsService {
   }
 
   async create(data: ProjectsRequestDTO) {
-    return await this.prismaClient.project.create({ data })
+    return await this.prismaClient.project.create({ data: { ...data, created_by_id: '123' } }) // REMOVER QDO TIVER AUTENTICACAO
   }
 
   async update(projectId: string, data: ProjectsRequestDTO) {
