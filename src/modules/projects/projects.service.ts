@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { CollaboratorRole } from 'src/generated/prisma/enums'
 import { PrismaService } from 'src/prisma.service'
 import { ProjectsRequestDTO } from './projects.dto'
 
@@ -39,7 +40,22 @@ export class ProjectsService {
   }
 
   async create(data: ProjectsRequestDTO) {
-    return await this.prismaClient.project.create({ data: { ...data, created_by_id: '123' } }) // REMOVER QDO TIVER AUTENTICACAO
+    const project = await this.prismaClient.project.create({
+      data: {
+        ...data,
+        created_by_id: '7b8a8ce5-8275-4d93-ad1e-1d4f28e4f586', // REMOVER QDO TIVER AUTENTICACAO
+      },
+    })
+
+    await this.prismaClient.projectCollaborator.create({
+      data: {
+        project_id: project.id,
+        user_id: '7b8a8ce5-8275-4d93-ad1e-1d4f28e4f586', // REMOVER QDO TIVER AUTENTICACAO
+        role: CollaboratorRole.OWNER,
+      },
+    })
+
+    return project
   }
 
   async update(projectId: string, data: ProjectsRequestDTO) {

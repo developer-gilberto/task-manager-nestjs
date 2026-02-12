@@ -23,7 +23,7 @@ export class CollaboratorsService {
   }
 
   async create(project_id: string, data: AddCollaboratorDTO) {
-    const user = await this.prismaClient.projectCollaborator.findUnique({
+    const user = await this.prismaClient.user.findUnique({
       where: { id: data.user_id },
     })
 
