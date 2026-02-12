@@ -11,6 +11,8 @@ import {
   Post,
   Put,
 } from '@nestjs/common'
+import { ApiResponse } from '@nestjs/swagger'
+import { CreateUserDTO, UpdateUserDTO, UserFullDTO, UserListItemDTO } from './users.dto'
 import { UsersService } from './users.service'
 
 @Controller({
@@ -21,11 +23,13 @@ export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Get()
+  @ApiResponse({ type: [UserListItemDTO] })
   getAll() {
     return this.userService.getAll()
   }
 
   @Get(':user_id')
+  @ApiResponse({ type: UserFullDTO })
   async getById(@Param('user_id', ParseUUIDPipe) userId: string) {
     const user = await this.userService.getById(userId)
 
@@ -36,12 +40,12 @@ export class UsersController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() data: any) {
+  async create(@Body() data: CreateUserDTO) {
     return this.userService.create(data)
   }
 
   @Put(':user_id')
-  async update(@Param('user_id', ParseUUIDPipe) userId: string, @Body() data: any) {
+  async update(@Param('user_id', ParseUUIDPipe) userId: string, @Body() data: UpdateUserDTO) {
     return this.userService.update(userId, data)
   }
 
