@@ -6,9 +6,9 @@ import { CommentRequestDTO } from './comments.dto'
 export class CommentsService {
   constructor(private readonly PrismaClient: PrismaService) {}
 
-  async getAllByTask(task_id: string) {
+  async getAllByTask(taskId: string) {
     return await this.PrismaClient.comment.findMany({
-      where: { task_id },
+      where: { task_id: taskId },
       include: {
         author: {
           select: {
@@ -22,11 +22,11 @@ export class CommentsService {
     })
   }
 
-  async getById(task_id: string, comment_id: string) {
+  async getById(taskId: string, commentId: string) {
     return await this.PrismaClient.comment.findFirst({
       where: {
-        id: comment_id,
-        task_id,
+        id: commentId,
+        task_id: taskId,
       },
       include: {
         author: {
@@ -48,12 +48,12 @@ export class CommentsService {
     })
   }
 
-  async create(task_id: string, data: CommentRequestDTO) {
+  async create(taskId: string, data: CommentRequestDTO) {
     return await this.PrismaClient.comment.create({
       data: {
         content: data.content,
-        task_id,
-        author_id: '123', // MUDAR ID DO USUARIO
+        task_id: taskId,
+        author_id: 'a643b276-92f8-4034-bc4a-32c996e42aba', // MUDAR ID DO USUARIO
       },
       include: {
         author: {
@@ -68,18 +68,18 @@ export class CommentsService {
     })
   }
 
-  async update(task_id: string, comment_id: string, data: CommentRequestDTO) {
+  async update(taskId: string, commentId: string, data: CommentRequestDTO) {
     const comment = await this.PrismaClient.comment.findFirst({
       where: {
-        id: comment_id,
-        task_id,
+        id: commentId,
+        task_id: taskId,
       },
     })
 
     if (!comment) throw new NotFoundException('Comment not found')
 
     return await this.PrismaClient.comment.update({
-      where: { id: comment_id },
+      where: { id: commentId },
       data,
       include: {
         author: {
@@ -94,18 +94,18 @@ export class CommentsService {
     })
   }
 
-  async delete(task_id: string, comment_id: string) {
+  async delete(taskId: string, commentId: string) {
     const comment = await this.PrismaClient.comment.findFirst({
       where: {
-        id: comment_id,
-        task_id,
+        id: commentId,
+        task_id: taskId,
       },
     })
 
     if (!comment) throw new NotFoundException('Comment not found')
 
     return await this.PrismaClient.comment.delete({
-      where: { id: comment_id },
+      where: { id: commentId },
     })
   }
 }

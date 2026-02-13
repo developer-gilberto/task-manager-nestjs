@@ -43,14 +43,14 @@ export class ProjectsService {
     const project = await this.prismaClient.project.create({
       data: {
         ...data,
-        created_by_id: '7b8a8ce5-8275-4d93-ad1e-1d4f28e4f586', // REMOVER QDO TIVER AUTENTICACAO
+        created_by_id: 'a643b276-92f8-4034-bc4a-32c996e42aba', // REMOVER QDO TIVER AUTENTICACAO
       },
     })
 
     await this.prismaClient.projectCollaborator.create({
       data: {
         project_id: project.id,
-        user_id: '7b8a8ce5-8275-4d93-ad1e-1d4f28e4f586', // REMOVER QDO TIVER AUTENTICACAO
+        user_id: project.created_by_id, // REMOVER QDO TIVER AUTENTICACAO
         role: CollaboratorRole.OWNER,
       },
     })
