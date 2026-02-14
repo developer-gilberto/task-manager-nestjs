@@ -1,5 +1,7 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
+import { AuthenticatedUser } from 'src/common/decorators/authenticated-user.decorator'
+import type { User } from 'src/generated/prisma/client'
 import { SignInDTO, SignUpDTO } from './auth.dto'
 import { AuthService } from './auth.service'
 
@@ -24,7 +26,7 @@ export class AuthController {
 
   @Get('protected')
   @UseGuards(AuthGuard('jwt'))
-  protected(@Req() req: any) {
-    return { message: `Authenticated! Welcome ${req.user.name}` }
+  protected(@AuthenticatedUser() user: User) {
+    return { message: `Authenticated! Welcome ${user.name}` }
   }
 }
