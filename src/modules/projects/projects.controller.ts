@@ -10,10 +10,12 @@ import {
   Post,
   Put,
   Req,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
 import { ApiResponse } from '@nestjs/swagger'
 import { ValidateId } from 'src/common/decorators/validate-id.decorator'
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
 import { ValidateIdInterceptor } from 'src/common/interceptors/validate-id.interceptor'
 import { Project } from 'src/generated/prisma/client'
 import { ProjectFullDTO, ProjectListItemDTO, ProjectsRequestDTO } from './projects.dto'
@@ -28,6 +30,7 @@ interface RequestWithProject extends Request {
   path: 'projects',
 })
 @UseInterceptors(ValidateIdInterceptor)
+@UseGuards(JwtAuthGuard)
 export class ProjectsController {
   constructor(private readonly projectService: ProjectsService) {}
 
