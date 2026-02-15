@@ -9,10 +9,12 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
 import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse } from '@nestjs/swagger'
 import { ValidateId } from 'src/common/decorators/validate-id.decorator'
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
 import { ValidateIdInterceptor } from 'src/common/interceptors/validate-id.interceptor'
 import { CommentFullDTO, CommentListItemDTO, CommentRequestDTO } from './comments.dto'
 import { CommentsService } from './comments.service'
@@ -22,6 +24,7 @@ import { CommentsService } from './comments.service'
   path: 'projects/:project_id/tasks/:task_id/comments',
 })
 @UseInterceptors(ValidateIdInterceptor)
+@UseGuards(JwtAuthGuard)
 export class CommentsController {
   constructor(private readonly commentService: CommentsService) {}
 

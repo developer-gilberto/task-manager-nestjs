@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
+import { RequestContextService } from 'src/common/services/request-context/request-context.service'
 import { PrismaService } from 'src/prisma.service'
 import { CommentRequestDTO } from './comments.dto'
 
 @Injectable()
 export class CommentsService {
-  constructor(private readonly PrismaClient: PrismaService) {}
+  constructor(
+    private readonly PrismaClient: PrismaService,
+    private readonly requestContext: RequestContextService,
+  ) {}
 
   async getAllByTask(taskId: string) {
     return await this.PrismaClient.comment.findMany({
@@ -49,11 +53,13 @@ export class CommentsService {
   }
 
   async create(taskId: string, data: CommentRequestDTO) {
+    const userId = this.requestContext.getUserId()
+
     return await this.PrismaClient.comment.create({
       data: {
         content: data.content,
         task_id: taskId,
-        author_id: 'a643b276-92f8-4034-bc4a-32c996e42aba', // MUDAR ID DO USUARIO
+        author_id: userId,
       },
       include: {
         author: {
@@ -69,10 +75,13 @@ export class CommentsService {
   }
 
   async update(taskId: string, commentId: string, data: CommentRequestDTO) {
+    const userId = this.requestContext.getUserId()
+
     const comment = await this.PrismaClient.comment.findFirst({
       where: {
         id: commentId,
         task_id: taskId,
+        author_id: userId,
       },
     })
 
@@ -95,10 +104,13 @@ export class CommentsService {
   }
 
   async delete(taskId: string, commentId: string) {
+    const userId = this.requestContext.getUserId()
+
     const comment = await this.PrismaClient.comment.findFirst({
       where: {
         id: commentId,
         task_id: taskId,
+        author_id: userId,
       },
     })
 
