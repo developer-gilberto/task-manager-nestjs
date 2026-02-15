@@ -21,7 +21,7 @@ import {HandlebarsAdapter} from '@nestjs-modules/mailer/dist/adapters/handlebars
         from: CONSTANTS.EMAIL_SENDER
       },
       template: {
-        dir: path.join(__dirname, 'templates'),
+        dir: path.join(__dirname, './templates'),
         adapter: new HandlebarsAdapter(),
         options: {
           strict: true
@@ -32,4 +32,5 @@ import {HandlebarsAdapter} from '@nestjs-modules/mailer/dist/adapters/handlebars
   providers: [MailService],
   exports: [MailService]
 })
-export class MailModule {}
+
+export class MailModule { }

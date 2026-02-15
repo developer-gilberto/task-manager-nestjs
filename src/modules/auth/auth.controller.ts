@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@n
 import { AuthGuard } from '@nestjs/passport'
 import { AuthenticatedUser } from 'src/common/decorators/authenticated-user.decorator'
 import type { User } from 'src/generated/prisma/client'
-import { SignInDTO, SignUpDTO } from './auth.dto'
+import { ForgotPasswordDTO, ResetPasswordDTO, SignInDTO, SignUpDTO } from './auth.dto'
 import { AuthService } from './auth.service'
 
 @Controller({
@@ -28,5 +28,17 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   protected(@AuthenticatedUser() user: User) {
     return { message: `Authenticated! Welcome ${user.name}` }
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  forgotPassword(@Body() data: ForgotPasswordDTO) {
+    return this.authService.forgotPassword(data.email)
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  resetPassword(@Body() data: ResetPasswordDTO) {
+    return this.authService.resetPassword(data.token, data.new_password)
   }
 }
