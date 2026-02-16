@@ -1,8 +1,10 @@
 import 'dotenv/config'
 import { ValidationPipe, VersioningType } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
+import { MicroserviceOptions, Transport } from '@nestjs/microservices'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { AppModule } from './app.module'
+import { CONSTANTS } from './constants'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -18,6 +20,17 @@ async function bootstrap() {
 
   const documentFactory = () => SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('api/v1/docs', app, documentFactory)
+
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [process.env.RABBITMQ_URL!],
+      queue: CONSTANTS.EMAIL_QUEUE,
+      queueOptions: { durable: true },
+    },
+  })
+
+  await app.startAllMicroservices()
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }))
 
