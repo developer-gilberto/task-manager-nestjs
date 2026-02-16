@@ -13,7 +13,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
-import { ApiResponse } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger'
 import { ValidateId } from 'src/common/decorators/validate-id.decorator'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
 import { ValidateIdInterceptor } from 'src/common/interceptors/validate-id.interceptor'
@@ -31,6 +31,7 @@ interface RequestWithProject extends Request {
 })
 @UseInterceptors(ValidateIdInterceptor)
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth('jwt')
 export class ProjectsController {
   constructor(private readonly projectService: ProjectsService) {}
 

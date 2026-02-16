@@ -12,7 +12,12 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
-import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse } from '@nestjs/swagger'
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiOkResponse,
+} from '@nestjs/swagger'
 import { ValidateId } from 'src/common/decorators/validate-id.decorator'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
 import { ValidateIdInterceptor } from 'src/common/interceptors/validate-id.interceptor'
@@ -25,6 +30,7 @@ import { CommentsService } from './comments.service'
 })
 @UseInterceptors(ValidateIdInterceptor)
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth('jwt')
 export class CommentsController {
   constructor(private readonly commentService: CommentsService) {}
 

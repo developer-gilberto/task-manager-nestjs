@@ -16,6 +16,16 @@ async function bootstrap() {
     .setTitle('Task Manager')
     .setDescription('Task manager developed with nestjs.')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        in: 'header',
+      },
+      'jwt',
+    )
     .build()
 
   const documentFactory = () => SwaggerModule.createDocument(app, config)

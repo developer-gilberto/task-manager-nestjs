@@ -1,5 +1,6 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
+import { ApiBearerAuth } from '@nestjs/swagger'
 import { AuthenticatedUser } from 'src/common/decorators/authenticated-user.decorator'
 import type { User } from 'src/generated/prisma/client'
 import { ForgotPasswordDTO, ResetPasswordDTO, SignInDTO, SignUpDTO } from './auth.dto'
@@ -26,6 +27,7 @@ export class AuthController {
 
   @Get('protected')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('jwt')
   protected(@AuthenticatedUser() user: User) {
     return { message: `Authenticated! Welcome ${user.name}` }
   }
