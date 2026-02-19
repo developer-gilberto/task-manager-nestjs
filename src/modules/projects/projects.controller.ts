@@ -19,6 +19,7 @@ import { ValidateId } from 'src/common/decorators/validate-id.decorator'
 import { QueryPaginationDTO } from 'src/common/dtos/query-pagination.dto'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
 import { ValidateIdInterceptor } from 'src/common/interceptors/validate-id.interceptor'
+import { ApiPaginatedResponse } from 'src/common/swagger/api-paginated-response'
 import { Project } from 'src/generated/prisma/client'
 import { ProjectFullDTO, ProjectListItemDTO, ProjectsRequestDTO } from './projects.dto'
 import { ProjectsService } from './projects.service'
@@ -38,7 +39,7 @@ export class ProjectsController {
   constructor(private readonly projectService: ProjectsService) {}
 
   @Get()
-  @ApiResponse({ type: [ProjectListItemDTO] })
+  @ApiPaginatedResponse(ProjectListItemDTO)
   async getAll(@Query() query?: QueryPaginationDTO) {
     return await this.projectService.getAll(query)
   }
