@@ -9,12 +9,14 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger'
 import { ValidateId } from 'src/common/decorators/validate-id.decorator'
+import { QueryPaginationDTO } from 'src/common/dtos/query-pagination.dto'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
 import { ValidateIdInterceptor } from 'src/common/interceptors/validate-id.interceptor'
 import { Project } from 'src/generated/prisma/client'
@@ -37,8 +39,8 @@ export class ProjectsController {
 
   @Get()
   @ApiResponse({ type: [ProjectListItemDTO] })
-  async getAll() {
-    return await this.projectService.getAll()
+  async getAll(@Query() query?: QueryPaginationDTO) {
+    return await this.projectService.getAll(query)
   }
 
   @Get(':project_id')
