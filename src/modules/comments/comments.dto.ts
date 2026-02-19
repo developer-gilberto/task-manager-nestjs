@@ -12,7 +12,7 @@ class CommentAuthorDTO {
   @ApiProperty() id: string
   @ApiProperty() name: string
   @ApiProperty() email: string
-  @ApiProperty({ nullable: true }) avatar: string
+  @ApiProperty({ nullable: true }) avatar: string | null
 }
 
 export class CommentListItemDTO {
@@ -20,8 +20,8 @@ export class CommentListItemDTO {
   @ApiProperty() content: string
   @ApiProperty() task_id: string
   @ApiProperty() author_id: string
-  @ApiProperty({ format: 'date-time' }) created_at: string
-  @ApiProperty({ format: 'date-time' }) updated_at: string
+  @ApiProperty({ format: 'date-time' }) created_at: Date
+  @ApiProperty({ format: 'date-time' }) updated_at: Date
 
   @ApiProperty({ type: CommentAuthorDTO })
   author: CommentAuthorDTO

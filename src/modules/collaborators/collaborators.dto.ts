@@ -33,7 +33,7 @@ class CollaboratorUserDTO {
   @ApiProperty() id: string
   @ApiProperty() name: string
   @ApiProperty() email: string
-  @ApiProperty({ nullable: true }) avatar: string
+  @ApiProperty({ nullable: true }) avatar: string | null
 }
 
 export class CollaboratorListItemDTO {
@@ -41,6 +41,6 @@ export class CollaboratorListItemDTO {
   @ApiProperty({ enum: CollaboratorRole }) role: CollaboratorRole
   @ApiProperty() project_id: string
   @ApiProperty() user_id: string
-  @ApiProperty({ format: 'date-time' }) created_at: string
+  @ApiProperty({ format: 'date-time' }) created_at: Date
   @ApiProperty({ type: CollaboratorUserDTO }) user: CollaboratorUserDTO
 }

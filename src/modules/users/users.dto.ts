@@ -55,10 +55,10 @@ export class UserListItemDTO {
   @ApiProperty() id: string
   @ApiProperty() name: string
   @ApiProperty() email: string
-  @ApiProperty() avatar: string
+  @ApiProperty() avatar: string | null
   @ApiProperty() role: UserRole
-  @ApiProperty() created_at: string
-  @ApiProperty() updated_at: string
+  @ApiProperty() created_at: Date
+  @ApiProperty() updated_at: Date
 }
 
 class UserProjectDTO {
