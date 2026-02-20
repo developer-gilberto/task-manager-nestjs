@@ -9,16 +9,24 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
-import { ApiBearerAuth } from '@nestjs/swagger'
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiOkResponse,
+} from '@nestjs/swagger'
 import { ValidateId } from 'src/common/decorators/validate-id.decorator'
+import { QueryPaginationDTO } from 'src/common/dtos/query-pagination.dto'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
 import { ValidateIdInterceptor } from 'src/common/interceptors/validate-id.interceptor'
+import { ApiPaginatedResponse } from 'src/common/swagger/api-paginated-response'
 import { Project, Task } from 'src/generated/prisma/client'
-import { TaskDTO } from './tasks.dto'
+import { TaskFullDTO, TaskListItemDTO, TaskRequestDTO } from './tasks.dto'
 import { TasksService } from './tasks.service'
 
 interface RequestWithProjectAndTask extends Request {
@@ -38,28 +46,40 @@ export class TasksController {
 
   @Get()
   @ValidateId()
-  async getAllProjects(@Param('project_id', ParseUUIDPipe) projectId: string) {
-    return await this.tasksService.getAllByProject(projectId)
+  @ApiPaginatedResponse(TaskListItemDTO)
+  async getAllByProjects(
+    @Param('project_id', ParseUUIDPipe) projectId: string,
+    @Query() query?: QueryPaginationDTO,
+  ) {
+    return await this.tasksService.getAllByProject(projectId, query)
   }
 
   @Get(':task_id')
   @ValidateId()
+  @ApiOkResponse({ type: TaskFullDTO })
   async getById(@Req() req: RequestWithProjectAndTask) {
-    return req.task
+    return await this.tasksService.getById(req.project.id, req.task.id)
   }
 
   @Post()
   @ValidateId()
-  async create(@Param('project_id', ParseUUIDPipe) projectId: string, @Body() data: TaskDTO) {
+  @ApiCreatedResponse({ type: TaskListItemDTO })
+  @HttpCode(HttpStatus.CREATED)
+  async create(
+    @Param('project_id', ParseUUIDPipe) projectId: string,
+    @Body() data: TaskRequestDTO,
+  ) {
     return await this.tasksService.create(projectId, data)
   }
 
   @Put(':task_id')
   @ValidateId()
+  @ApiOkResponse({ type: TaskListItemDTO })
+  @HttpCode(HttpStatus.OK)
   async update(
     @Param('project_id', ParseUUIDPipe) ProjectId: string,
     @Param('task_id', ParseUUIDPipe) taskId: string,
-    @Body() data: TaskDTO,
+    @Body() data: TaskRequestDTO,
   ) {
     return await this.tasksService.update(ProjectId, taskId, data)
   }
@@ -67,6 +87,7 @@ export class TasksController {
   @Delete(':task_id')
   @ValidateId()
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({ description: 'Task deleted successfully' })
   async delete(
     @Param('project_id', ParseUUIDPipe) projectId: string,
     @Param('task_id', ParseUUIDPipe) taskId: string,
