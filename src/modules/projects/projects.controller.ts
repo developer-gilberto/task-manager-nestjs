@@ -10,7 +10,6 @@ import {
   Post,
   Put,
   Query,
-  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
@@ -20,13 +19,8 @@ import { QueryPaginationDTO } from 'src/common/dtos/query-pagination.dto'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
 import { ValidateIdInterceptor } from 'src/common/interceptors/validate-id.interceptor'
 import { ApiPaginatedResponse } from 'src/common/swagger/api-paginated-response'
-import { Project } from 'src/generated/prisma/client'
 import { ProjectFullDTO, ProjectListItemDTO, ProjectsRequestDTO } from './projects.dto'
 import { ProjectsService } from './projects.service'
-
-interface RequestWithProject extends Request {
-  project: Project
-}
 
 @Controller({
   version: '1',
@@ -60,14 +54,17 @@ export class ProjectsController {
   @Put(':project_id')
   @ApiResponse({ type: ProjectListItemDTO })
   @ValidateId()
-  async update(@Req() req: RequestWithProject, @Body() data: ProjectsRequestDTO) {
-    return this.projectService.update(req.project.id, data)
+  async update(
+    @Param('project_id', ParseUUIDPipe) projectId: string,
+    @Body() data: ProjectsRequestDTO,
+  ) {
+    return this.projectService.update(projectId, data)
   }
 
   @Delete(':project_id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ValidateId()
-  async delete(@Req() req: RequestWithProject) {
-    return this.projectService.delete(req.project.id)
+  async delete(@Param('project_id', ParseUUIDPipe) projectId: string) {
+    return this.projectService.delete(projectId)
   }
 }
