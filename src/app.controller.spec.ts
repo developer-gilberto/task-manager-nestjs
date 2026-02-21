@@ -1,22 +1,24 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { Test, TestingModule } from '@nestjs/testing'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
 
 describe('AppController', () => {
-  let appController: AppController;
+  let appController: AppController
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
       providers: [AppService],
-    }).compile();
+    }).compile()
 
-    appController = app.get<AppController>(AppController);
-  });
+    appController = app.get<AppController>(AppController)
+  })
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
-    });
-  });
-});
+  describe('HealthCheck', () => {
+    it('should return "API v1 is running! Documentation available at:  /api/v1/docs"', () => {
+      expect(appController.getHealthCheck()).toEqual({
+        message: 'API v1 is running! Documentation available at:  /api/v1/docs',
+      })
+    })
+  })
+})
