@@ -10,7 +10,6 @@ import {
   Post,
   Put,
   Query,
-  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
@@ -25,14 +24,8 @@ import { QueryPaginationDTO } from 'src/common/dtos/query-pagination.dto'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
 import { ValidateIdInterceptor } from 'src/common/interceptors/validate-id.interceptor'
 import { ApiPaginatedResponse } from 'src/common/swagger/api-paginated-response'
-import { Project, Task } from 'src/generated/prisma/client'
 import { TaskFullDTO, TaskListItemDTO, TaskRequestDTO } from './tasks.dto'
 import { TasksService } from './tasks.service'
-
-interface RequestWithProjectAndTask extends Request {
-  project: Project
-  task: Task
-}
 
 @Controller({
   version: '1',
@@ -57,8 +50,11 @@ export class TasksController {
   @Get(':task_id')
   @ValidateId()
   @ApiOkResponse({ type: TaskFullDTO })
-  async getById(@Req() req: RequestWithProjectAndTask) {
-    return await this.tasksService.getById(req.project.id, req.task.id)
+  async getById(
+    @Param('project_id', ParseUUIDPipe) ProjectId: string,
+    @Param('task_id', ParseUUIDPipe) taskId: string,
+  ) {
+    return await this.tasksService.getById(ProjectId, taskId)
   }
 
   @Post()
