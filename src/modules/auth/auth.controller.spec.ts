@@ -6,6 +6,7 @@ import { UsersService } from '../users/users.service'
 import { AuthController } from './auth.controller'
 import { AuthModule } from './auth.module'
 import { AuthService } from './auth.service'
+import { RequestContextService } from 'src/common/services/request-context/request-context.service'
 
 describe('AuthController', () => {
   let controller: AuthController
@@ -31,6 +32,10 @@ describe('AuthController', () => {
       })
       .overrideProvider(UsersService)
       .useValue(userService)
+      .overrideProvider(RequestContextService)
+      .useValue({
+        getUserId: jest.fn().mockReturnValue('user-1')
+      })
       .compile()
 
     controller = module.get<AuthController>(AuthController)
@@ -68,7 +73,7 @@ describe('AuthController', () => {
     it('should be able to sign in with the correct credentials', async () => {
       const user = mockedUsers[0]
       const mockedResponse = {
-        user_auth_token: '123',
+        token: '123',
       }
 
       jest.spyOn(service, 'signin').mockResolvedValue(mockedResponse)
