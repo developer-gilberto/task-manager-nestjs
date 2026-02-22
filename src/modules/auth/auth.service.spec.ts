@@ -91,7 +91,7 @@ describe('AuthService', () => {
         password: '123',
       })
 
-      expect(result).toEqual({ user_auth_token: '123' })
+      expect(result).toEqual({ token: '123' })
       expect(userService.getByEmail).toHaveBeenCalledTimes(1)
     })
 
