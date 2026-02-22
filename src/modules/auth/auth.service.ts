@@ -1,11 +1,16 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
 import { CONSTANTS } from 'src/constants'
 import { PrismaService } from 'src/prisma.service'
+import { MailService } from '../mail/mail.service'
 import { UsersService } from '../users/users.service'
 import { SignInDTO, SignUpDTO } from './auth.dto'
-import { MailService } from '../mail/mail.service'
 
 interface TokenPayload {
   user_id: string
@@ -21,7 +26,7 @@ export class AuthService {
     private readonly userService: UsersService,
     private readonly prismaClient: PrismaService,
     private readonly jwtService: JwtService,
-    private readonly mailService: MailService
+    private readonly mailService: MailService,
   ) {}
 
   async signup(data: SignUpDTO) {
@@ -49,7 +54,7 @@ export class AuthService {
 
     const token = this.jwtService.sign({ user_id: storedUser.id })
 
-    return { user_auth_token: token }
+    return { token }
   }
 
   async forgotPassword(email: string) {
@@ -60,13 +65,13 @@ export class AuthService {
     const token = this.jwtService.sign({
       sub: user.id,
       email: user.email,
-      purpose: 'password_reset'
+      purpose: 'password_reset',
     })
 
     await this.mailService.sendForgotPasswordRequest(user.email, token)
 
     return {
-      message: 'Password request email sent'
+      message: 'Password request email sent',
     }
   }
 
@@ -84,7 +89,7 @@ export class AuthService {
 
       return await this.prismaClient.user.update({
         where: { id: user.id },
-        data: {password: newHash}
+        data: { password: newHash },
       })
     } catch (err) {
       console.log(err)
