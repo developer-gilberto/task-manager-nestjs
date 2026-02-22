@@ -21,7 +21,20 @@ export class ProjectsService {
     const projects = await this.prismaClient.project.findMany({
       skip,
       take,
-      where: { created_by_id: userId },
+      where: {
+        OR: [
+          {
+            created_by_id: userId,
+          },
+          {
+            project_collaborators: {
+              some: {
+                user_id: userId,
+              },
+            },
+          },
+        ],
+      },
     })
 
     const total = await this.prismaClient.project.count({
@@ -58,6 +71,7 @@ export class ProjectsService {
         description: true,
         created_at: true,
         updated_at: true,
+        created_by_id: true,
 
         tasks: {
           select: {
@@ -112,6 +126,12 @@ export class ProjectsService {
     const userId = this.requestContext.getUserId()
 
     await this.prismaClient.task.deleteMany({
+      where: {
+        project_id: projectId,
+      },
+    })
+
+    await this.prismaClient.projectCollaborator.deleteMany({
       where: {
         project_id: projectId,
       },
