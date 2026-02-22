@@ -10,7 +10,7 @@ import { CONSTANTS } from 'src/constants'
 import { PrismaService } from 'src/prisma.service'
 import { MailService } from '../mail/mail.service'
 import { UsersService } from '../users/users.service'
-import { SignInDTO, SignUpDTO } from './auth.dto'
+import { ChangePasswordDTo, SignInDTO, SignUpDTO } from './auth.dto'
 
 interface TokenPayload {
   user_id: string
@@ -91,9 +91,27 @@ export class AuthService {
         where: { id: user.id },
         data: { password: newHash },
       })
-    } catch (err) {
-      console.log(err)
+    } catch (_err) {
       throw new BadRequestException('Invalid or expired token')
     }
+  }
+
+  async changePassword(userId: string, data: ChangePasswordDTo) {
+    const user = await this.prismaClient.user.findUnique({
+      where: { id: userId },
+    })
+
+    if (!user) throw new NotFoundException('User not found')
+
+    const isValidPassword = await bcrypt.compare(data.current_password, user.password)
+
+    if (!isValidPassword) throw new UnauthorizedException('Current password is not valid')
+
+    const newHash = await bcrypt.hash(data.new_password, CONSTANTS.PASSWORD_SALT)
+
+    return this.prismaClient.user.update({
+      where: { id: userId },
+      data: { password: newHash },
+    })
   }
 }

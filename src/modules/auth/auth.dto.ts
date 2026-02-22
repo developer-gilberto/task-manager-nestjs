@@ -61,3 +61,16 @@ export class ResetPasswordDTO {
   @MinLength(6)
   new_password: string
 }
+
+export class ChangePasswordDTo {
+  @ApiProperty({ description: 'Current password' })
+  @IsString()
+  @IsNotEmpty()
+  current_password: string
+
+  @ApiProperty({ description: 'New password' })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(6)
+  new_password: string
+}
