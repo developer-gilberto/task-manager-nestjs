@@ -1,12 +1,12 @@
 import { JwtService } from '@nestjs/jwt'
 import { Test, TestingModule } from '@nestjs/testing'
+import { RequestContextService } from 'src/common/services/request-context/request-context.service'
 import { PrismaService } from 'src/prisma.service'
 import { mockedUsers } from '../users/users.mocks'
 import { UsersService } from '../users/users.service'
 import { AuthController } from './auth.controller'
 import { AuthModule } from './auth.module'
 import { AuthService } from './auth.service'
-import { RequestContextService } from 'src/common/services/request-context/request-context.service'
 
 describe('AuthController', () => {
   let controller: AuthController
@@ -34,7 +34,7 @@ describe('AuthController', () => {
       .useValue(userService)
       .overrideProvider(RequestContextService)
       .useValue({
-        getUserId: jest.fn().mockReturnValue('user-1')
+        getUserId: jest.fn().mockReturnValue('user-1'),
       })
       .compile()
 
@@ -142,6 +142,38 @@ describe('AuthController', () => {
       await expect(controller.resetPassword({ token: '', new_password: '' })).rejects.toThrow(
         'Token is required',
       )
+    })
+  })
+
+  describe('changePassword', () => {
+    it('should be able to change the password', async () => {
+      const user = mockedUsers[0]
+
+      jest.spyOn(service, 'changePassword').mockResolvedValue(user)
+
+      const response = await controller.changePassword(user, {
+        current_password: '123',
+        new_password: '321',
+      })
+
+      expect(response).toEqual({
+        message: 'Password changed successfully!',
+      })
+      expect(service.changePassword).toHaveBeenCalledTimes(1)
+    })
+
+    it('should be able to handle validation errors', async () => {
+      const user = mockedUsers[0]
+      const error = new Error('CurrentPassword is required')
+
+      jest.spyOn(service, 'changePassword').mockRejectedValue(error)
+
+      await expect(
+        controller.changePassword(user, {
+          current_password: '',
+          new_password: '',
+        }),
+      ).rejects.toThrow('CurrentPassword is required')
     })
   })
 })
