@@ -1,8 +1,8 @@
-import 'dotenv/config'
 import { ValidationPipe, VersioningType } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { MicroserviceOptions, Transport } from '@nestjs/microservices'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import 'dotenv/config'
 import { AppModule } from './app.module'
 import { CONSTANTS } from './constants'
 
